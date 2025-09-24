@@ -1,0 +1,90 @@
+import { ConflictException, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { LoginRequestDto, LoginResponseDto } from './dto';
+import { UserService } from '../user/user.service';
+import * as bcrypt from 'bcrypt';
+import { Response } from 'express';
+import { IJwtPayload } from '../user/interfaces';
+import { ConfigService } from '@nestjs/config';
+import * as ms from 'ms';
+
+@Injectable()
+export class AuthService {
+  private readonly JWT_ACCESS_TOKEN_TTL: string;
+  private readonly JWT_REFRESH_TOKEN_TTL: string;
+  private readonly COOKIE_DOMAIN: string;
+
+  constructor(
+    private jwtService: JwtService,
+    private configService: ConfigService,
+    private userService: UserService,
+  ) {
+    this.JWT_ACCESS_TOKEN_TTL = configService.getOrThrow<string>(
+      'JWT_ACCESS_TOKEN_TTL',
+    );
+    this.JWT_REFRESH_TOKEN_TTL = configService.getOrThrow<string>(
+      'JWT_REFRESH_TOKEN_TTL',
+    );
+    this.COOKIE_DOMAIN = configService.getOrThrow<string>('COOKIE_DOMAIN');
+  }
+
+  async login(res: Response, dto: LoginRequestDto): Promise<LoginResponseDto> {
+    const { email, password } = dto;
+
+    const user = await this.userService.getByEmail(email);
+
+    if (!user) {
+      throw new ConflictException('Неверная почта или пароль');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      throw new ConflictException('Неверная почта или пароль');
+    }
+
+    if (!user.userInfo?.role) {
+      throw new ConflictException('Неизвестная роль');
+    }
+
+    const payload: IJwtPayload = {
+      id: user.id,
+      role: user.userInfo?.role?.name,
+    };
+
+    return {
+      surname: user.userInfo.surname,
+      name: user.userInfo.name,
+      role: user.userInfo.role.name,
+      accessToken: await this.generateJwtTokens(res, payload),
+    };
+  }
+
+  async generateJwtTokens(
+    res: Response,
+    payload: IJwtPayload,
+  ): Promise<string> {
+    const accessToken = await this.signJwtToken(
+      payload,
+      this.JWT_ACCESS_TOKEN_TTL,
+    );
+    const refreshToken = await this.signJwtToken(
+      payload,
+      this.JWT_REFRESH_TOKEN_TTL,
+    );
+
+    res.cookie('no-cookies', refreshToken, {
+      httpOnly: true,
+      sameSite: 'lax',
+      domain: this.COOKIE_DOMAIN,
+      maxAge: ms(this.JWT_REFRESH_TOKEN_TTL as ms.StringValue),
+    });
+    return accessToken;
+  }
+
+  async signJwtToken(payload: IJwtPayload, expiresIn: string) {
+    return await this.jwtService.signAsync(payload, {
+      expiresIn,
+    });
+  }
+}
