@@ -2,7 +2,7 @@ import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateUserRequestDto } from './dto';
 import * as bcrypt from 'bcrypt';
-import { IUserInfo } from './interfaces';
+import { IUserInfo, IUserRole } from './interfaces';
 
 @Injectable()
 export class UserService {
@@ -52,6 +52,26 @@ export class UserService {
           select: {
             surname: true,
             name: true,
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+  }
+
+  async getById(id: number): Promise<IUserRole | null> {
+    return await this.prismaService.user.findUnique({
+      where: {
+        id,
+      },
+      select: {
+        id: true,
+        userInfo: {
+          include: {
             role: {
               select: {
                 name: true,

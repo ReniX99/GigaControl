@@ -1,4 +1,8 @@
-import { ConflictException, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginRequestDto, LoginResponseDto } from './dto';
 import { UserService } from '../user/user.service';
@@ -7,6 +11,7 @@ import { Response } from 'express';
 import { IJwtPayload } from '../user/interfaces';
 import { ConfigService } from '@nestjs/config';
 import * as ms from 'ms';
+import { IReqPayload } from '../user/interfaces/req-payload.interface';
 
 @Injectable()
 export class AuthService {
@@ -49,7 +54,6 @@ export class AuthService {
 
     const payload: IJwtPayload = {
       id: user.id,
-      role: user.userInfo?.role?.name,
     };
 
     return {
@@ -86,5 +90,19 @@ export class AuthService {
     return await this.jwtService.signAsync(payload, {
       expiresIn,
     });
+  }
+
+  async validate(payload: IJwtPayload): Promise<IReqPayload> {
+    const user = await this.userService.getById(payload.id);
+
+    if (!user) {
+      throw new UnauthorizedException('Неизвестный пользователь');
+    }
+
+    if (!user.userInfo?.role) {
+      throw new UnauthorizedException('Неизвестная роль');
+    }
+
+    return { id: user.id, role: user.userInfo.role.name };
   }
 }
