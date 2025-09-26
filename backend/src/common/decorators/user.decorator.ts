@@ -11,7 +11,7 @@ export const User = createParamDecorator(
 
     const user = request.user;
 
-    if (!user) throw new NotFoundException();
+    if (!user) throw new NotFoundException('Пользователь не найден');
 
     return data ? user[data] : user;
   },
