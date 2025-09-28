@@ -1,13 +1,14 @@
 import {
   ConflictException,
   Injectable,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { LoginRequestDto, LoginResponseDto } from './dto';
+import { LoginRequestDto, LoginResponseDto, RefreshResponseDto } from './dto';
 import { UserService } from '../user/user.service';
 import * as bcrypt from 'bcrypt';
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { IJwtPayload } from '../user/interfaces';
 import { ConfigService } from '@nestjs/config';
 import * as ms from 'ms';
@@ -104,5 +105,29 @@ export class AuthService {
     }
 
     return { id: user.id, role: user.userInfo.role.name };
+  }
+
+  async refreshToken(req: Request): Promise<RefreshResponseDto> {
+    const refreshToken = req.cookies['no-cookies'] as string;
+
+    if (!refreshToken)
+      throw new UnauthorizedException('Недействительный refresh-токен');
+
+    let payload: IJwtPayload;
+    try {
+      payload = await this.jwtService.verifyAsync(refreshToken);
+    } catch {
+      throw new UnauthorizedException('Проблемы с payload');
+    }
+
+    const user = await this.userService.getById(payload.id);
+
+    if (!user) throw new NotFoundException('Пользователь не найден');
+    const accessToken = await this.signJwtToken(
+      { id: user.id },
+      this.JWT_ACCESS_TOKEN_TTL,
+    );
+
+    return { accessToken };
   }
 }
