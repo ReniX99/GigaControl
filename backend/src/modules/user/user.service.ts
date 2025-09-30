@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserRequestDto } from './dto';
+import { CreateUserRequestDto, UserInfoResponseDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { IUserInfo, IUserRole } from './interfaces';
 
@@ -81,5 +81,61 @@ export class UserService {
         },
       },
     });
+  }
+
+  async getAll(): Promise<UserInfoResponseDto[]> {
+    const users = await this.prismaService.user.findMany({
+      where: {
+        userInfo: {
+          role: {
+            NOT: {
+              name: 'Админ',
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+        email: true,
+        userInfo: {
+          select: {
+            surname: true,
+            name: true,
+            role: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: [
+        {
+          userInfo: {
+            role: {
+              name: 'asc',
+            },
+          },
+        },
+        {
+          userInfo: {
+            surname: 'asc',
+          },
+        },
+        {
+          userInfo: {
+            name: 'asc',
+          },
+        },
+      ],
+    });
+
+    return users.map((u) => ({
+      id: u.id,
+      email: u.email,
+      surname: u.userInfo!.surname,
+      name: u.userInfo!.name,
+      role: u.userInfo!.role?.name,
+    }));
   }
 }

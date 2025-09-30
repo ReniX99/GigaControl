@@ -1,6 +1,6 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserRequestDto } from './dto';
+import { CreateUserRequestDto, UserInfoResponseDto } from './dto';
 import { Authorization, Roles } from 'src/common/decorators';
 import { RoleEnum } from 'src/shared/enums';
 
@@ -13,5 +13,12 @@ export class UserController {
   @Post('create')
   async create(@Body() dto: CreateUserRequestDto) {
     return await this.userService.create(dto);
+  }
+
+  @Roles(RoleEnum.ADMIN)
+  @Authorization()
+  @Get()
+  async getAll(): Promise<UserInfoResponseDto[]> {
+    return await this.userService.getAll();
   }
 }
