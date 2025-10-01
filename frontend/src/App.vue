@@ -1,7 +1,21 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+  import { Header } from './shared/components'
+</script>
 
 <template>
-  <h1 class="text-[20px]">Hello world</h1>
+  <div class="flex min-h-screen flex-col">
+    <Header></Header>
+    <div class="flex flex-1 bg-[#F4F5FA]">
+      <router-view></router-view>
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style>
+  body {
+    font-family: 'Montserrat', 'sans-serif';
+    font-weight: 500;
+    font-size: 14px;
+    color: '#161515';
+  }
+</style>
