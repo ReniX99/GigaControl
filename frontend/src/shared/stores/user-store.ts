@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, shallowRef } from 'vue'
 import type { IUserInfo } from '../interfaces'
 import type { ILoginReponse } from '@/modules/auth/interfaces'
+import { getNewAccessToken, logout } from '../api'
 
 export const useUserStore = defineStore(
   'user',
@@ -20,7 +21,22 @@ export const useUserStore = defineStore(
       accessToken.value = loginResponse.accessToken
     }
 
-    return { isAuth, userInfo, accessToken, auth }
+    async function refreshToken(): Promise<string> {
+      const newToken = await getNewAccessToken()
+
+      accessToken.value = newToken
+      return newToken
+    }
+
+    async function exit() {
+      await logout()
+
+      isAuth.value = false
+      userInfo.value = undefined
+      accessToken.value = ''
+    }
+
+    return { isAuth, userInfo, accessToken, auth, refreshToken, exit }
   },
   { persist: true },
 )
