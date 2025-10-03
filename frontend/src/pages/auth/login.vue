@@ -3,5 +3,7 @@
 </script>
 
 <template>
-  <LoginForm></LoginForm>
+  <div class="mx-auto">
+    <LoginForm></LoginForm>
+  </div>
 </template>

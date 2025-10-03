@@ -3,6 +3,9 @@
   import type { ILoginForm } from '../interfaces'
   import { submitForm } from './api'
   import type { IError } from '@/shared/interfaces'
+  import { useRouter } from 'vue-router'
+  import { useUserStore } from '@/shared/stores/user-store'
+  import { storeToRefs } from 'pinia'
 
   const form = ref<ILoginForm>({
     email: '',
@@ -14,9 +17,17 @@
     message: '',
   })
 
+  const router = useRouter()
   const handleForm = async () => {
     try {
       await submitForm(form.value)
+
+      const userStore = useUserStore()
+      const { userInfo } = storeToRefs(userStore)
+
+      if (userInfo.value?.role === 'Админ') {
+        router.push('/admin')
+      }
     } catch (e) {
       if (e instanceof Error) {
         error.value = {
@@ -53,7 +64,7 @@
             type="password"
             minlength="8"
             required
-            class="rounded-[6px] border border-[#5E5E5E] px-[8px] py-[7px] text-[16px] font-normal"
+            class="rounded-[6px] border border-[#5E5E5E] px-[8px] py-[7px] text-[16px] font-medium"
           />
         </div>
       </div>

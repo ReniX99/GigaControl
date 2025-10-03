@@ -20,7 +20,7 @@ export const useUserStore = defineStore(
       accessToken.value = loginResponse.accessToken
     }
 
-    return { isAuth, userInfo, auth }
+    return { isAuth, userInfo, accessToken, auth }
   },
   { persist: true },
 )
