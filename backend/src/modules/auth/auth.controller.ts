@@ -19,4 +19,9 @@ export class AuthController {
   async refresh(@Req() req: Request): Promise<RefreshResponseDto> {
     return await this.authService.refreshToken(req);
   }
+
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    return this.authService.logout(res);
+  }
 }

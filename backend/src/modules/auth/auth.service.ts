@@ -20,6 +20,8 @@ export class AuthService {
   private readonly JWT_REFRESH_TOKEN_TTL: string;
   private readonly COOKIE_DOMAIN: string;
 
+  private readonly COOKIE_NAME = 'no-cookies';
+
   constructor(
     private jwtService: JwtService,
     private configService: ConfigService,
@@ -65,50 +67,8 @@ export class AuthService {
     };
   }
 
-  async generateJwtTokens(
-    res: Response,
-    payload: IJwtPayload,
-  ): Promise<string> {
-    const accessToken = await this.signJwtToken(
-      payload,
-      this.JWT_ACCESS_TOKEN_TTL,
-    );
-    const refreshToken = await this.signJwtToken(
-      payload,
-      this.JWT_REFRESH_TOKEN_TTL,
-    );
-
-    res.cookie('no-cookies', refreshToken, {
-      httpOnly: true,
-      sameSite: 'lax',
-      domain: this.COOKIE_DOMAIN,
-      maxAge: ms(this.JWT_REFRESH_TOKEN_TTL as ms.StringValue),
-    });
-    return accessToken;
-  }
-
-  async signJwtToken(payload: IJwtPayload, expiresIn: string) {
-    return await this.jwtService.signAsync(payload, {
-      expiresIn,
-    });
-  }
-
-  async validate(payload: IJwtPayload): Promise<IReqPayload> {
-    const user = await this.userService.getById(payload.id);
-
-    if (!user) {
-      throw new UnauthorizedException('Неизвестный пользователь');
-    }
-
-    if (!user.userInfo?.role) {
-      throw new UnauthorizedException('Неизвестная роль');
-    }
-
-    return { id: user.id, role: user.userInfo.role.name };
-  }
-
   async refreshToken(req: Request): Promise<RefreshResponseDto> {
-    const refreshToken = req.cookies['no-cookies'] as string;
+    const refreshToken = req.cookies[this.COOKIE_NAME] as string;
 
     if (!refreshToken)
       throw new UnauthorizedException('Недействительный refresh-токен');
@@ -129,5 +89,65 @@ export class AuthService {
     );
 
     return { accessToken };
+  }
+
+  logout(res: Response) {
+    this.setCookie(res, this.COOKIE_NAME, '', 0);
+  }
+
+  private async generateJwtTokens(
+    res: Response,
+    payload: IJwtPayload,
+  ): Promise<string> {
+    const accessToken = await this.signJwtToken(
+      payload,
+      this.JWT_ACCESS_TOKEN_TTL,
+    );
+    const refreshToken = await this.signJwtToken(
+      payload,
+      this.JWT_REFRESH_TOKEN_TTL,
+    );
+
+    this.setCookie(
+      res,
+      this.COOKIE_NAME,
+      refreshToken,
+      ms(this.JWT_REFRESH_TOKEN_TTL as ms.StringValue),
+    );
+    return accessToken;
+  }
+
+  private async signJwtToken(payload: IJwtPayload, expiresIn: string) {
+    return await this.jwtService.signAsync(payload, {
+      expiresIn,
+    });
+  }
+
+  private setCookie(
+    res: Response,
+    cookieName: string,
+    token: string,
+    age: number,
+  ) {
+    res.cookie(cookieName, token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      domain: this.COOKIE_DOMAIN,
+      maxAge: age,
+    });
+  }
+
+  async validate(payload: IJwtPayload): Promise<IReqPayload> {
+    const user = await this.userService.getById(payload.id);
+
+    if (!user) {
+      throw new UnauthorizedException('Неизвестный пользователь');
+    }
+
+    if (!user.userInfo?.role) {
+      throw new UnauthorizedException('Неизвестная роль');
+    }
+
+    return { id: user.id, role: user.userInfo.role.name };
   }
 }
