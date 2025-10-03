@@ -18,4 +18,5 @@
     </Sidebar>
     <AdminPanel></AdminPanel>
   </div>
+  <RouterView></RouterView>
 </template>
