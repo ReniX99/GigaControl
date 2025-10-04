@@ -41,5 +41,79 @@ model UserInfo {
   roleId Int? @map("role_id")
   role Role? @relation(fields: [roleId], references: [id], onDelete: SetNull)
 
+  registratedDefects Defect[] @relation("defects_creator_id_fkey")
+
+  assignedDefects Defect[] @relation("defects_engineer_id_fkey")
+
   @@map("usersinfo")
+}
+
+model Project {
+  id Int @id @default(autoincrement())
+
+  title String
+
+  description String
+
+  defects Defect[]
+
+  @@map("projects")
+}
+
+model Priority {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  defects Defect[]
+
+  @@map("priorities")
+}
+
+model Status {
+  id Int @id @default(autoincrement())
+
+  name String
+
+  defects Defect[]
+
+  @@map("stasuses")
+}
+
+model Defect {
+  id Int @id @default(autoincrement())
+
+  projectId Int @map("project_id")
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  creatorId Int? @map("creator_id")
+  creator UserInfo? @relation(fields: [creatorId], references: [userId], onDelete: SetNull, name: "defects_creator_id_fkey")
+
+  title String
+
+  description String
+
+  priorityId Int? @map("priority_id")
+  priority Priority? @relation(fields: [priorityId], references: [id], onDelete: SetNull)
+
+  statusId Int @default(1)
+  status Status @relation(fields: [statusId], references: [id], onDelete: SetDefault)
+
+  deadline DateTime
+
+  engineerId Int? @map("engineer_id")
+  engineer UserInfo? @relation(fields: [engineerId], references: [userId], onDelete: SetNull, name: "defects_engineer_id_fkey")
+
+  attachments Attachment[]
+
+  @@map("defects")
+}
+
+model Attachment {
+  id Int @id @default(autoincrement())
+
+  defectId Int
+  defect Defect @relation(fields: [defectId], references: [id], onDelete: Cascade)
+
+  @@map("attachments")
 }
