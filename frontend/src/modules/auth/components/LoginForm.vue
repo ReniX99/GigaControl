@@ -27,6 +27,8 @@
 
       if (userInfo.value?.role === 'Админ') {
         router.push('/admin')
+      } else {
+        router.push('/')
       }
     } catch (e) {
       if (e instanceof Error) {
