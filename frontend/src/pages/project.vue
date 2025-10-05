@@ -8,7 +8,7 @@
   <div class="flex flex-1">
     <Sidebar>
       <SidebarList>
-        <RouterLink :to="{ name: '/' }">
+        <RouterLink :to="{ name: '/project' }">
           <SidebarElement name="Проекты">
             <ProjectsSvg></ProjectsSvg>
           </SidebarElement>
@@ -16,5 +16,6 @@
       </SidebarList>
     </Sidebar>
     <ProjectsInfo></ProjectsInfo>
+    <RouterView></RouterView>
   </div>
 </template>
