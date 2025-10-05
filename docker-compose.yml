@@ -11,5 +11,23 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
 
+  frontend:
+    build:
+      context: ./frontend
+    container_name: vue-app
+    ports:
+      - 5173:80
+
+  backend:
+    build:
+      context: ./backend
+    env_file:
+      - ./backend/.env.prod
+    container_name: nest-app
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
 volumes:
   postgres-data:
