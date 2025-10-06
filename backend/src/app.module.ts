@@ -6,6 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProjectModule } from './modules/project/project.module';
 import { PriorityModule } from './modules/priority/priority.module';
+import { StatusesModule } from './modules/statuses/statuses.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PriorityModule } from './modules/priority/priority.module';
     AuthModule,
     ProjectModule,
     PriorityModule,
+    StatusesModule,
   ],
 })
 export class AppModule {}
