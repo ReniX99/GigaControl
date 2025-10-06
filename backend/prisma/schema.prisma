@@ -99,7 +99,9 @@ model Defect {
   statusId Int @default(1)
   status Status @relation(fields: [statusId], references: [id], onDelete: SetDefault)
 
-  deadline DateTime
+  deadline DateTime?
+
+  completionDate DateTime? @map("completion_date")
 
   engineerId Int? @map("engineer_id")
   engineer UserInfo? @relation(fields: [engineerId], references: [userId], onDelete: SetNull, name: "defects_engineer_id_fkey")
