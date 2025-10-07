@@ -89,6 +89,8 @@ model Defect {
   creatorId Int? @map("creator_id")
   creator UserInfo? @relation(fields: [creatorId], references: [userId], onDelete: SetNull, name: "defects_creator_id_fkey")
 
+  registrationDate DateTime @map("registration_date")
+
   title String
 
   description String
