@@ -13,7 +13,7 @@ import { ProjectService } from '../project/project.service';
 import { PriorityService } from '../priority/priority.service';
 import { UserService } from '../user/user.service';
 import { RoleEnum } from 'src/shared/enums';
-import { StatusesService } from '../statuses/statuses.service';
+import { StatusService } from '../status/status.service';
 import type { IDefectModel } from './interfaces';
 
 @Injectable()
@@ -23,7 +23,7 @@ export class DefectService {
     private projectService: ProjectService,
     private priorityService: PriorityService,
     private userService: UserService,
-    private statusService: StatusesService,
+    private statusService: StatusService,
   ) {}
 
   async createDefect(

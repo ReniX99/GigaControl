@@ -6,7 +6,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProjectModule } from './modules/project/project.module';
 import { PriorityModule } from './modules/priority/priority.module';
-import { StatusesModule } from './modules/statuses/statuses.module';
+import { StatusModule } from './modules/status/status.module';
 import { DefectModule } from './modules/defect/defect.module';
 
 @Module({
@@ -20,7 +20,7 @@ import { DefectModule } from './modules/defect/defect.module';
     AuthModule,
     ProjectModule,
     PriorityModule,
-    StatusesModule,
+    StatusModule,
     DefectModule,
   ],
 })

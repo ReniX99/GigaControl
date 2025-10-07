@@ -4,7 +4,7 @@ import { CreateStatusDto, StatusDto } from './dto';
 import { Status } from 'generated/prisma';
 
 @Injectable()
-export class StatusesService {
+export class StatusService {
   constructor(private prismaService: PrismaService) {}
 
   async create(dto: CreateStatusDto): Promise<void> {

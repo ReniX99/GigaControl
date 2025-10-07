@@ -3,12 +3,12 @@ import { DefectService } from './defect.service';
 import { DefectController } from './defect.controller';
 import { ProjectModule } from '../project/project.module';
 import { PriorityModule } from '../priority/priority.module';
-import { StatusesModule } from '../statuses/statuses.module';
+import { StatusModule } from '../status/status.module';
 import { UserModule } from '../user/user.module';
 
 @Module({
   controllers: [DefectController],
   providers: [DefectService],
-  imports: [ProjectModule, PriorityModule, StatusesModule, UserModule],
+  imports: [ProjectModule, PriorityModule, StatusModule, UserModule],
 })
 export class DefectModule {}

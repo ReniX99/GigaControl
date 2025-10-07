@@ -1,12 +1,12 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { StatusesService } from './statuses.service';
+import { StatusService } from './status.service';
 import { CreateStatusDto, StatusDto } from './dto';
 import { Authentication, Authorization, Roles } from 'src/common/decorators';
 import { RoleEnum } from 'src/shared/enums';
 
 @Controller('statuses')
-export class StatusesController {
-  constructor(private readonly statusesService: StatusesService) {}
+export class StatusController {
+  constructor(private readonly statusesService: StatusService) {}
 
   @Roles(RoleEnum.DIRECTOR, RoleEnum.MANAGER)
   @Authorization()
