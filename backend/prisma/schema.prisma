@@ -96,7 +96,7 @@ model Defect {
   priorityId Int? @map("priority_id")
   priority Priority? @relation(fields: [priorityId], references: [id], onDelete: SetNull)
 
-  statusId Int @default(1)
+  statusId Int @default(1) @map("status_id")
   status Status @relation(fields: [statusId], references: [id], onDelete: SetDefault)
 
   deadline DateTime?
