@@ -5,5 +5,6 @@ import { PriorityController } from './priority.controller';
 @Module({
   controllers: [PriorityController],
   providers: [PriorityService],
+  exports: [PriorityService],
 })
 export class PriorityModule {}

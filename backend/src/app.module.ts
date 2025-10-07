@@ -7,6 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { ProjectModule } from './modules/project/project.module';
 import { PriorityModule } from './modules/priority/priority.module';
 import { StatusesModule } from './modules/statuses/statuses.module';
+import { DefectModule } from './modules/defect/defect.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { StatusesModule } from './modules/statuses/statuses.module';
     ProjectModule,
     PriorityModule,
     StatusesModule,
+    DefectModule,
   ],
 })
 export class AppModule {}

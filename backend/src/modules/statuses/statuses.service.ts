@@ -25,6 +25,16 @@ export class StatusesService {
     });
   }
 
+  async getIdByName(name: string): Promise<number | undefined> {
+    const status = await this.prismaService.status.findFirst({
+      where: {
+        name,
+      },
+    });
+
+    return status?.id;
+  }
+
   async getAll(): Promise<StatusDto[]> {
     return await this.prismaService.status.findMany();
   }

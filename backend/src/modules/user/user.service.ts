@@ -1,6 +1,6 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateUserRequestDto, UserInfoResponseDto } from './dto';
+import { CreateUserRequestDto, EngineerDto, UserInfoResponseDto } from './dto';
 import * as bcrypt from 'bcrypt';
 import { IUserInfo, IUserRole } from './interfaces';
 
@@ -136,6 +136,30 @@ export class UserService {
       surname: u.userInfo!.surname,
       name: u.userInfo!.name,
       role: u.userInfo!.role?.name,
+    }));
+  }
+
+  async getEngineers(): Promise<EngineerDto[]> {
+    const engineers = await this.prismaService.userInfo.findMany({
+      where: {
+        role: {
+          name: 'Инженер',
+        },
+      },
+      select: {
+        userId: true,
+        surname: true,
+        name: true,
+      },
+      orderBy: {
+        surname: 'asc',
+      },
+    });
+
+    return engineers.map((e) => ({
+      id: e.userId,
+      surname: e.surname,
+      name: e.name,
     }));
   }
 }

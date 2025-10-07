@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { CreateUserRequestDto, UserInfoResponseDto } from './dto';
+import { CreateUserRequestDto, EngineerDto, UserInfoResponseDto } from './dto';
 import { Authorization, Roles } from 'src/common/decorators';
 import { RoleEnum } from 'src/shared/enums';
 
@@ -20,5 +20,12 @@ export class UserController {
   @Get()
   async getAll(): Promise<UserInfoResponseDto[]> {
     return await this.userService.getAll();
+  }
+
+  @Roles(RoleEnum.DIRECTOR, RoleEnum.MANAGER)
+  @Authorization()
+  @Get('engineers')
+  async getEngineers(): Promise<EngineerDto[]> {
+    return await this.userService.getEngineers();
   }
 }
