@@ -41,6 +41,15 @@ api.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config
     const userStore = useUserStore()
+    const { userInfo } = storeToRefs(userStore)
+
+    if (error.response.status === 403) {
+      if (userInfo.value?.role === 'Админ') {
+        router.push({ name: '/admin' })
+      } else {
+        router.push({ name: '/project' })
+      }
+    }
 
     if (error.response.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
