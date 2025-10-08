@@ -16,4 +16,4 @@ RUN pnpm run build
 
 EXPOSE 3000
 
-CMD ["node", "dist/main"]
+CMD ["sh", "-c", "pnpx prisma migrate deploy && pnpx prisma db seed && pnpm run start:prod"]
